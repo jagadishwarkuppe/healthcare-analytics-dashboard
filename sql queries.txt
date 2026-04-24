@@ -1,0 +1,148 @@
+-- =========================================
+-- Advanced Healthcare System Pressure Analysis
+-- PostgreSQL Queries
+-- =========================================
+
+
+-- 1. View available indicators
+SELECT DISTINCT indicator
+FROM hospital_data;
+
+
+
+-- 2. Hospital occupancy trend
+SELECT
+date,
+value AS hospital_patients
+FROM hospital_data
+WHERE indicator = 'Daily hospital occupancy'
+ORDER BY date;
+
+
+
+-- 3. ICU occupancy trend
+SELECT
+date,
+value AS icu_patients
+FROM hospital_data
+WHERE indicator = 'Daily ICU occupancy'
+ORDER BY date;
+
+
+
+-- 4. Monthly healthcare pressure analysis
+SELECT
+DATE_TRUNC('month', date) AS month,
+indicator,
+AVG(value) AS avg_patients
+FROM hospital_data
+GROUP BY month, indicator
+ORDER BY month;
+
+
+
+-- 5. Peak healthcare pressure days
+SELECT
+date,
+indicator,
+value
+FROM hospital_data
+ORDER BY value DESC
+LIMIT 10;
+
+
+
+-- 6. Yearly healthcare load trend
+SELECT
+DATE_TRUNC('year', date) AS year,
+indicator,
+AVG(value) AS avg_load
+FROM hospital_data
+GROUP BY year, indicator
+ORDER BY year;
+
+
+
+-- 7. Dataset time range
+SELECT
+MIN(date) AS start_date,
+MAX(date) AS end_date
+FROM hospital_data;
+
+
+
+-- 8. Final dataset exported to Power BI
+SELECT
+date,
+EXTRACT(YEAR FROM date) AS year,
+EXTRACT(MONTH FROM date) AS month,
+indicator,
+value
+FROM hospital_data
+ORDER BY date;
+
+
+
+-- 9. Peak hospital occupancy
+SELECT
+MAX(value) AS peak_hospital_occupancy
+FROM hospital_data
+WHERE indicator='Daily hospital occupancy';
+
+
+
+-- 10. Peak ICU occupancy
+SELECT
+MAX(value) AS peak_icu_occupancy
+FROM hospital_data
+WHERE indicator='Daily ICU occupancy';
+
+
+
+-- 11. Average hospital occupancy
+SELECT
+AVG(value) AS avg_hospital_load
+FROM hospital_data
+WHERE indicator='Daily hospital occupancy';
+
+
+
+-- 12. Average ICU occupancy
+SELECT
+AVG(value) AS avg_icu_load
+FROM hospital_data
+WHERE indicator='Daily ICU occupancy';
+
+
+
+-- 13. Total hospital patients
+SELECT
+SUM(value) AS total_hospital_patients
+FROM hospital_data
+WHERE indicator='Daily hospital occupancy';
+
+
+
+-- 14. Total ICU patients
+SELECT
+SUM(value) AS total_icu_patients
+FROM hospital_data
+WHERE indicator='Daily ICU occupancy';
+
+
+
+-- 15. ICU-to-Hospital utilization ratio
+SELECT
+ROUND(
+(
+SELECT SUM(value)
+FROM hospital_data
+WHERE indicator='Daily ICU occupancy'
+)
+/
+(
+SELECT SUM(value)
+FROM hospital_data
+WHERE indicator='Daily hospital occupancy'
+),4
+) AS icu_ratio;
